@@ -1,6 +1,9 @@
 import numpy as np
 import cv2
- 
+import time
+
+FRAMERATE = 5
+
 # initialize the HOG descriptor/person detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -9,6 +12,7 @@ cv2.startWindowThread()
 
 # open webcam video stream
 cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
 
 # the output will be written to output.avi
 out = cv2.VideoWriter(
@@ -43,6 +47,7 @@ while(True):
     cv2.imshow('frame',frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
+    time.sleep(1/FRAMERATE)
 
 # When everything done, release the capture
 cap.release()
