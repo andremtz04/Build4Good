@@ -9,20 +9,42 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: true,
+            contextIsolation: false // Allow communication between Electron and frontend
         }
     });
 
-    // Load the HTML file
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-    // Read queue time from the JSON file created by Python
-    const queueTimeFilePath = path.join(__dirname, 'queue_time.json');
-    const queueTimeData = fs.readFileSync(queueTimeFilePath, 'utf-8');
-    const queueTime = JSON.parse(queueTimeData).queue_time;
+    // Function to send queue time to frontend
+    function sendQueueTime() {
+        const queueTimeFilePath = path.join(__dirname, 'queue_time.json');
 
-    // Send the queue time to the frontend
-    mainWindow.webContents.send('queue-time', queueTime);
+        if (fs.existsSync(queueTimeFilePath)) {
+            try {
+                const queueTimeData = fs.readFileSync(queueTimeFilePath, 'utf-8');
+                const queueTime = JSON.parse(queueTimeData).queue_time;
+
+                console.log("Updating queue time:", queueTime);
+                mainWindow.webContents.send('queue-time', queueTime);
+            } catch (error) {
+                console.error("Error reading queue time file:", error);
+            }
+        } else {
+            console.error("Queue time file not found:", queueTimeFilePath);
+        }
+    }
+
+    // Watch the file for changes and update the frontend
+    const queueTimeFilePath = path.join(__dirname, 'queue_time.json');
+    fs.watch(queueTimeFilePath, (eventType) => {
+        if (eventType === 'change') {
+            sendQueueTime();
+        }
+    });
+
+    // Send the initial queue time when the window loads
+    mainWindow.webContents.once('did-finish-load', sendQueueTime);
 }
 
 app.whenReady().then(createWindow);

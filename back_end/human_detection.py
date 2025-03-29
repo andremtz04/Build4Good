@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import time
 
-FRAMERATE = 5
+FRAMERATE = 10
 persons_detected = 0
 
 # Initialize the HOG descriptor/person detector

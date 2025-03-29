@@ -6,6 +6,7 @@ from back_end.human_detection import persons_detected, FRAMERATE
 
 run_timer = False            # turns the analyzer on
 timer = 0                    # keeps track of time in seconds
+queue_time = 0
 
     # starts tracking per refresh how many people are in queue #
 def start_timer(): # takes in refresh rate of calculator
@@ -29,4 +30,4 @@ def estimated_queue_time(persons):
     # needs to calculate average time per person to estimate queue time
     
 def get_queue_time(): # allows the server to get the queue time
-    return estimated_queue_time(persons_detected)
+    return queue_time
