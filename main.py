@@ -7,7 +7,8 @@ from back_end.human_detection import start_camera_capture, get_persons_detected
 from back_end.queue_calculator import get_queue_time
 
 def run_electron_app():
-    electron_path = r"C:\Users\linda\AppData\Roaming\npm\node_modules\electron\dist\electron.exe"
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the script's directory
+    electron_path = os.path.join(script_dir, 'node_modules', 'electron', 'dist', 'electron.exe')
     app_path = os.path.join(os.getcwd(), 'front_end', 'main.js')
 
     try:
