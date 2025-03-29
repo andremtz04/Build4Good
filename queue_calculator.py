@@ -1,15 +1,15 @@
 import time
+from constants import FRAMERATE
 
 from human_detection import persons_detected
 
 run_timer = False            # turns the analyzer on
 timer = 0                    # keeps track of time in seconds
-refreshes_per_second = 0     # frequency of refreshes
 
     # starts tracking per refresh how many people are in queue #
-def start_timer(refreshes_per_second): # takes in refresh rate of calculator
+def start_timer(): # takes in refresh rate of calculator
     run_timer = True
-    time_per_refresh = 1 / refreshes_per_second
+    time_per_refresh = 1 / FRAMERATE
     
     while run_timer:
         estimated_queue_time(persons_detected) # runs estimater with timer
