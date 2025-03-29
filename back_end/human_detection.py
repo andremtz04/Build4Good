@@ -1,10 +1,10 @@
 import numpy as np
 import cv2
+import os
+from ultralytics import YOLO
 
 from queue_calculator import Queue_Calculator
 import multiprocessing
-
-FRAMERATE = 5
 
 ########## Our "main" file ################
 from constants import FRAMERATE
@@ -18,8 +18,11 @@ def main():
     queue_tracker = Queue_Calculator(5, 10)
 
     # initialize the HOG descriptor/person detector
-    hog = cv2.HOGDescriptor()
-    hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+        #hog = cv2.HOGDescriptor()
+        #hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+    base_dir = os.path.dirname(__file__)
+    model_path = os.path.join(base_dir, "models", "best.pt")
+    trained_model = YOLO(model_path)
 
     cv2.startWindowThread()
 
@@ -51,9 +54,17 @@ def main():
 
         # detect people in the image
         # returns the bounding boxes for the detected objects
-        boxes, weights = hog.detectMultiScale(frame, winStride=(8,8) )
+            #boxes, weights = hog.detectMultiScale(frame, winStride=(8,8) )
+            #boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
+        # Use YOLOv8 model to detect people
+        results = trained_model(frame)
 
-        boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
+        # Extract bounding boxes
+        boxes = []
+        for result in results:
+            for box in result.boxes:
+                x1, y1, x2, y2 = map(int, box.xyxy[0])  # Convert to int
+                boxes.append([x1, y1, x2, y2])
 
         # ensure safe updates
         with persons_detected.get_lock():
