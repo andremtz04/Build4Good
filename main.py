@@ -4,7 +4,6 @@ import json
 import os
 import time
 from back_end.human_detection import start_camera_capture, get_persons_detected
-from back_end.queue_calculator import get_queue_time
 
 def run_electron_app():
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the script's directory
