@@ -5,11 +5,13 @@ import os
 from ultralytics import YOLO
 
 FRAMERATE = 10
+CONFIDENCE_THRESHOLD = 0.5
 persons_detected = 0
 
-# Initialize the HOG descriptor/person detector
-hog = cv2.HOGDescriptor()
-hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+# Load trained YOLOv8 model
+base_dir = os.path.dirname(__file__)
+model_path = os.path.join(base_dir, "models", "best.pt")  # Adjust path if needed
+model = YOLO(model_path)
 
 def start_camera_capture():
     print("Starting camera...")
@@ -36,13 +38,24 @@ def start_camera_capture():
         # Convert to grayscale for faster detection
         gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
-        # Detect people in the image
-        boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
+        # Use YOLOv8 for detecting people
+        results = model(frame)
+
+        # Extract bounding boxes
+        boxes = []
+        for result in results:
+            for box in result.boxes:
+                conf = box.conf[0].item()  # Get confidence score
+                if conf >= CONFIDENCE_THRESHOLD:  # Filter by confidence
+                    x1, y1, x2, y2 = map(int, box.xyxy[0])  # Convert to int
+                    boxes.append([x1, y1, x2, y2])
+
+        # Update shared value for queue tracking
         persons_detected = len(boxes)
 
-        # Draw detected boxes
-        for (x, y, w, h) in boxes:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # Draw bounding boxes on the frame
+        for (xA, yA, xB, yB) in boxes:
+            cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
         # Display the frame
         cv2.imshow('Human Detection', frame)
