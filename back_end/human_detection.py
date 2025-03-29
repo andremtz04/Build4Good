@@ -1,16 +1,19 @@
 import numpy as np
 import cv2
 import time
+import os
+from ultralytics import YOLO
 
 FRAMERATE = 10
-persons_detected = 5
+CONFIDENCE_THRESHOLD = 0.5
+persons_detected = 0
 
-# Initialize the HOG descriptor/person detector
-hog = cv2.HOGDescriptor()
-hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
+# Initialize trained YOLOv8 model
+base_dir = os.path.dirname(__file__)
+model_path = os.path.join(base_dir, "models", "best.pt")  # Adjust path if needed
+model = YOLO(model_path)
 
 def start_camera_capture():
-
     print("Starting camera...")
 
     # Open webcam video stream
@@ -22,15 +25,7 @@ def start_camera_capture():
 
     cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
 
-    # Output video file
-    out = cv2.VideoWriter(
-        'output.avi',
-        cv2.VideoWriter_fourcc(*'MJPG'),
-        15.0,
-        (640, 480)
-    )
     while True:
-        
         # Capture frame-by-frame
         ret, frame = cap.read()
         if not ret:
@@ -43,17 +38,24 @@ def start_camera_capture():
         # Convert to grayscale for faster detection
         gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
 
-        # Detect people in the image
-        boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
+        # Use YOLOv8 for detecting people
+        results = model(frame)
+
+        # Extract bounding boxes
+        boxes = []
+        for result in results:
+            for box in result.boxes:
+                conf = box.conf[0].item()
+                if conf >= CONFIDENCE_THRESHOLD:
+                    x1, y1, x2, y2 = map(int, box.xyxy[0])  # Convert to int
+                    boxes.append([x1, y1, x2, y2])
+
         global persons_detected
         persons_detected = len(boxes)
 
-        # Draw detected boxes
-        for (x, y, w, h) in boxes:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-        # Write to output video
-        out.write(frame.astype('uint8'))
+        # Draw bounding boxes on the frame
+        for (xA, yA, xB, yB) in boxes:
+            cv2.rectangle(frame, (xA, yA), (xB, yB), (0, 255, 0), 2)
 
         # Display the frame
         cv2.imshow('Human Detection', frame)
@@ -67,15 +69,13 @@ def start_camera_capture():
 
     # Cleanup
     cap.release()
-    out.release()
     cv2.destroyAllWindows()
     cv2.waitKey(1)  # Ensure window closes properly
     print("Camera closed.")
-
-# Run the function if this script is executed directly
-
+    
 def get_persons_detected():
     return persons_detected
 
+# Run the function if this script is executed directly
 if __name__ == "__main__":
     start_camera_capture()
