@@ -11,11 +11,13 @@ cv2.startWindowThread()
 cap = cv2.VideoCapture(0)
 
 # the output will be written to output.avi
-out = cv2.VideoWriter(
-    'output.avi',
-    cv2.VideoWriter_fourcc(*'MJPG'),
-    15.,
-    (640,480))
+# out = cv2.VideoWriter(
+#     'output.avi',
+#     cv2.VideoWriter_fourcc(*'MJPG'),
+#     15.,
+#     (640,480))
+
+persons_detected = 0 
 
 while(True):
     # Capture frame-by-frame
@@ -32,13 +34,17 @@ while(True):
 
     boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
 
+    persons_detected = len(boxes)
+    print("Persons detected:", persons_detected)
+
     for (xA, yA, xB, yB) in boxes:
         # display the detected boxes in the colour picture
         cv2.rectangle(frame, (xA, yA), (xB, yB),
                           (0, 255, 0), 2)
     
     # Write the output video 
-    out.write(frame.astype('uint8'))
+    #out.write(frame.astype('uint8'))
+
     # Display the resulting frame
     cv2.imshow('frame',frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -47,7 +53,7 @@ while(True):
 # When everything done, release the capture
 cap.release()
 # and release the output
-out.release()
+# out.release()
 # finally, close the window
 cv2.destroyAllWindows()
 cv2.waitKey(1)
