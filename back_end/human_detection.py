@@ -2,13 +2,21 @@ import numpy as np
 import cv2
 
 from queue_calculator import Queue_Calculator
-import time
 import multiprocessing
+
+FRAMERATE = 5
 
 ########## Our "main" file ################
 from constants import FRAMERATE
 
 def main():
+    # open webcam video stream
+    cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
+
+    # refresh queue counting 5 times/sec, 10 min estimated per person
+    queue_tracker = Queue_Calculator(5, 10)
+
     # initialize the HOG descriptor/person detector
     hog = cv2.HOGDescriptor()
     hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
@@ -28,8 +36,6 @@ def main():
     # persons_detected becomes shared value across processes
     persons_detected = multiprocessing.Value('i', 0)
 
-    # refresh queue counting 5 times/sec, 10 min estimated per person
-    queue_tracker = Queue_Calculator(5, 10)
     # pass in persons_detected so its available to queue_tracker object
     process = multiprocessing.Process(target=queue_tracker.start_tracking, args=(persons_detected,))
     process.start()

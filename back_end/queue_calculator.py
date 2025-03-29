@@ -1,4 +1,5 @@
 import time
+#from back_end.human_detection import persons_detected, FRAMERATE
 
 # from human_detection import persons_detected
 
@@ -13,6 +14,7 @@ class Queue_Calculator:
         self.refreshes_per_second = refreshes
         self.run_timer = False
         self.time_per_person = time_per_person # idk minutes
+        self.queue_time = 0
 
         # calculates estimated queue time #
     def estimated_queue_time(self, persons_detected): 
@@ -26,10 +28,14 @@ class Queue_Calculator:
         time_per_refresh = 1 / self.refreshes_per_second
         
         while self.run_timer:
-            queue_time = self.estimated_queue_time(persons_detected) # runs estimater with timer
-            print("Estimated queue time:", queue_time)
+            self.queue_time = self.estimated_queue_time(persons_detected) # runs estimater with timer
+            print("Estimated queue time:", self.queue_time)
             time.sleep(time_per_refresh)
 
-        # stops tracking people in line #
+    # stops tracking people in line #
     def stop_tracking(self):          
         self.run_timer = False
+    
+    # needs to calculate average time per person to estimate queue time
+    def get_queue_time(): # allows the server to get the queue time
+        return self.queue_time
