@@ -1,11 +1,21 @@
 import numpy as np
 import cv2
+import time
+
+FRAMERATE = 5
+
+# initialize the HOG descriptor/person detector
+hog = cv2.HOGDescriptor()
+hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 from queue_calculator import Queue_Calculator
 import time
 import multiprocessing
 
 ########## Our "main" file ################
+# open webcam video stream
+cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
 
 def main():
     # initialize the HOG descriptor/person detector
@@ -32,6 +42,22 @@ def main():
     # pass in persons_detected so its available to queue_tracker object
     process = multiprocessing.Process(target=queue_tracker.start_tracking, args=(persons_detected,))
     process.start()
+    boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
+    
+    persons_detected = len(boxes)
+
+    for (xA, yA, xB, yB) in boxes:
+        # display the detected boxes in the colour picture
+        cv2.rectangle(frame, (xA, yA), (xB, yB),
+                          (0, 255, 0), 2)
+    
+    # Write the output video 
+    out.write(frame.astype('uint8'))
+    # Display the resulting frame
+    cv2.imshow('frame',frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+    time.sleep(1/FRAMERATE)
 
     while(True):
         # Capture frame-by-frame
