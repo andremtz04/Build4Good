@@ -3,13 +3,14 @@ import cv2
 import time
 
 FRAMERATE = 10
-persons_detected = 0
+persons_detected = 5
 
 # Initialize the HOG descriptor/person detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
 def start_camera_capture():
+
     print("Starting camera...")
 
     # Open webcam video stream
@@ -28,8 +29,8 @@ def start_camera_capture():
         15.0,
         (640, 480)
     )
-
     while True:
+        
         # Capture frame-by-frame
         ret, frame = cap.read()
         if not ret:
@@ -44,6 +45,7 @@ def start_camera_capture():
 
         # Detect people in the image
         boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
+        global persons_detected
         persons_detected = len(boxes)
 
         # Draw detected boxes
@@ -71,5 +73,9 @@ def start_camera_capture():
     print("Camera closed.")
 
 # Run the function if this script is executed directly
+
+def get_persons_detected():
+    return persons_detected
+
 if __name__ == "__main__":
     start_camera_capture()

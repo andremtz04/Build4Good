@@ -6,7 +6,7 @@ from back_end.human_detection import persons_detected, FRAMERATE
 
 run_timer = False            # turns the analyzer on
 timer = 0                    # keeps track of time in seconds
-queue_time = 0
+queue_time = 1
 
     # starts tracking per refresh how many people are in queue #
 def start_timer(): # takes in refresh rate of calculator
