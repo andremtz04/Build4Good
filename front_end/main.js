@@ -25,7 +25,7 @@ function createWindow() {
                 const queueTimeData = fs.readFileSync(queueTimeFilePath, 'utf-8');
                 const queueTime = JSON.parse(queueTimeData).queue_time;
 
-                console.log("Updating queue time:", queueTime);
+                console.log("Updating queue line:", queueTime);
                 mainWindow.webContents.send('queue-time', queueTime);
             } catch (error) {
                 console.error("Error reading queue time file:", error);

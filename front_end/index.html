@@ -8,8 +8,8 @@
         const { ipcRenderer } = require('electron');
 
         // Listen for the queue-time message from the main process
-        ipcRenderer.on('queue-time', (event, queueTime) => {
-            document.getElementById("queueTimeDisplay").innerText = `Estimated Queue Time: ${queueTime} minutes`;
+        ipcRenderer.on('Queue App', (event, queueTime) => {
+            document.getElementById("queueTimeDisplay").innerText = `Queue Line: ${queueTime} people waiting`;
         });
     </script>
 </head>
