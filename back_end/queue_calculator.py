@@ -1,4 +1,7 @@
-import time
+import time, sys, os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # import from other folders
+
 from back_end.human_detection import persons_detected, FRAMERATE
 
 run_timer = False            # turns the analyzer on

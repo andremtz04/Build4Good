@@ -3,58 +3,73 @@ import cv2
 import time
 
 FRAMERATE = 5
+persons_detected = 0
 
-# initialize the HOG descriptor/person detector
+# Initialize the HOG descriptor/person detector
 hog = cv2.HOGDescriptor()
 hog.setSVMDetector(cv2.HOGDescriptor_getDefaultPeopleDetector())
 
-cv2.startWindowThread()
+def start_camera_capture():
+    print("Starting camera...")
 
-# open webcam video stream
-cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
-
-# the output will be written to output.avi
-out = cv2.VideoWriter(
-    'output.avi',
-    cv2.VideoWriter_fourcc(*'MJPG'),
-    15.,
-    (640,480))
-
-while(True):
-    # Capture frame-by-frame
-    ret, frame = cap.read()
-
-    # resizing for faster detection
-    frame = cv2.resize(frame, (640, 480))
-    # using a greyscale picture, also for faster detection
-    gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-
-    # detect people in the image
-    # returns the bounding boxes for the detected objects
-    boxes, weights = hog.detectMultiScale(frame, winStride=(8,8) )
-
-    boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
+    # Open webcam video stream
+    cap = cv2.VideoCapture(0)
     
-    persons_detected = len(boxes)
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+        return
 
-    for (xA, yA, xB, yB) in boxes:
-        # display the detected boxes in the colour picture
-        cv2.rectangle(frame, (xA, yA), (xB, yB),
-                          (0, 255, 0), 2)
-    
-    # Write the output video 
-    out.write(frame.astype('uint8'))
-    # Display the resulting frame
-    cv2.imshow('frame',frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-    time.sleep(1/FRAMERATE)
+    cap.set(cv2.CAP_PROP_FPS, FRAMERATE)
 
-# When everything done, release the capture
-cap.release()
-# and release the output
-out.release()
-# finally, close the window
-cv2.destroyAllWindows()
-cv2.waitKey(1)
+    # Output video file
+    out = cv2.VideoWriter(
+        'output.avi',
+        cv2.VideoWriter_fourcc(*'MJPG'),
+        15.0,
+        (640, 480)
+    )
+
+    while True:
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+        if not ret:
+            print("Failed to capture frame. Exiting...")
+            break
+
+        # Resize for faster detection
+        frame = cv2.resize(frame, (640, 480))
+
+        # Convert to grayscale for faster detection
+        gray = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+
+        # Detect people in the image
+        boxes, weights = hog.detectMultiScale(frame, winStride=(8, 8))
+        persons_detected = len(boxes)
+
+        # Draw detected boxes
+        for (x, y, w, h) in boxes:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+        # Write to output video
+        out.write(frame.astype('uint8'))
+
+        # Display the frame
+        cv2.imshow('Human Detection', frame)
+
+        # Press 'q' to exit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+
+        # Control frame rate
+        time.sleep(1 / FRAMERATE)
+
+    # Cleanup
+    cap.release()
+    out.release()
+    cv2.destroyAllWindows()
+    cv2.waitKey(1)  # Ensure window closes properly
+    print("Camera closed.")
+
+# Run the function if this script is executed directly
+if __name__ == "__main__":
+    start_camera_capture()
