@@ -6,6 +6,7 @@ import time
 import multiprocessing
 
 ########## Our "main" file ################
+from constants import FRAMERATE
 
 def main():
     # initialize the HOG descriptor/person detector
