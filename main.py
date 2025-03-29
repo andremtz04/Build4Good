@@ -8,42 +8,40 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) 
 from back_end.queue_calculator import get_queue_time
 
 def run_camera():
-    try:
-        cap = cv2.VideoCapture(0)
-        if not cap.isOpened():
-            print("Error: Could not open video stream.")
-            return
+    # Open the camera
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        print("Error: Could not open camera.")
+        return
 
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                break
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            print("Error: Failed to grab frame.")
+            break
 
-            # Optionally process the frame or detect persons here
+        # Here, you can add your detection logic
+        # Example: Resize the frame
+        frame = cv2.resize(frame, (640, 480))
 
-            # Resize frame
-            frame = cv2.resize(frame, (640, 480))
+        # Display the frame
+        cv2.imshow("Camera", frame)
 
-            # Show the frame (or process it)
-            cv2.imshow('Camera', frame)
+        # Close the camera window when 'q' is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-            # Exit loop if 'q' is pressed
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                break
-
-        cap.release()
-        cv2.destroyAllWindows()
-
-    except Exception as e:
-        print(f"Error in camera capture: {e}")
+    cap.release()
+    cv2.destroyAllWindows()
 
 # Function to run the Electron app after saving the queue time
 def run_electron_app():
     try:
+        # Get the current directory and build the path to main.js
         current_directory = os.getcwd()
         electron_app_path = os.path.join(current_directory, 'front_end', 'main.js')
 
-        # Debugging: Verify the path of the Electron app
+        # Verify the Electron app path
         print(f"Attempting to launch Electron app at: {electron_app_path}")
 
         # Check if the Electron app file exists
@@ -51,9 +49,18 @@ def run_electron_app():
             print(f"Error: The Electron app file does not exist at {electron_app_path}")
             return
 
-        # Run the Electron app using npx
+        # Full path to the Electron binary
+        electron_binary_path = os.path.join(current_directory, 'node_modules', '.bin', 'electron')
+
+        # Debugging: Verify that Electron binary exists
+        print(f"Electron binary path: {electron_binary_path}")
+        if not os.path.exists(electron_binary_path):
+            print(f"Error: Electron binary not found at {electron_binary_path}")
+            return
+
+        # Run the Electron app using the full path to the Electron binary
         result = subprocess.run(
-            ['npx', 'electron', electron_app_path],  # Use npx to call electron
+            [electron_binary_path, electron_app_path],  # Use the full path to Electron binary
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE
@@ -71,7 +78,7 @@ def run_electron_app():
         print("Error Output:", e.stderr.decode())
     except Exception as ex:
         print(f"Unexpected error: {ex}")
-
+        
 # Main function to calculate queue time and launch Electron
 def main():
     try:
