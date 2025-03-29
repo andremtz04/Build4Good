@@ -1,5 +1,5 @@
 import time
-from back_end.human_detection import persons_detected, FRAMERATE
+#from back_end.human_detection import persons_detected, FRAMERATE
 
 # from human_detection import persons_detected
 

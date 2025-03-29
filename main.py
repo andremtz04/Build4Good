@@ -5,7 +5,7 @@ import os, sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) # import from other folders
 
-from back_end.queue_calculator import get_queue_time
+from back_end.human_detection import queue_tracker
 
 def run_camera():
     # Open the camera
@@ -83,7 +83,7 @@ def run_electron_app():
 def main():
     try:
         # Step 1: Calculate queue time
-        queue_time = get_queue_time()
+        queue_time = queue_tracker.get_queue_time()
         print(f"Queue Time Calculated: {queue_time}")
 
         # Step 2: Save the queue time to a JSON file
