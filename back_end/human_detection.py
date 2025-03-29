@@ -51,6 +51,7 @@ def start_camera_capture():
                     boxes.append([x1, y1, x2, y2])
 
         # Update shared value for queue tracking
+        global persons_detected
         persons_detected = len(boxes)
 
         # Draw bounding boxes on the frame
