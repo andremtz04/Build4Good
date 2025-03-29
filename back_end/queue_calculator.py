@@ -1,7 +1,5 @@
 import time
-from constants import FRAMERATE
-
-from human_detection import persons_detected
+from back_end.human_detection import persons_detected, FRAMERATE
 
 run_timer = False            # turns the analyzer on
 timer = 0                    # keeps track of time in seconds
@@ -21,6 +19,11 @@ def stop_timer():
 
     # calculates estimated queue time #
 def estimated_queue_time(persons): 
-    p = persons
+    queue_time = persons
+    
+    return queue_time
     
     # needs to calculate average time per person to estimate queue time
+    
+def get_queue_time(): # allows the server to get the queue time
+    return estimated_queue_time(persons_detected)

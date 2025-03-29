@@ -35,6 +35,8 @@ while(True):
     boxes, weights = hog.detectMultiScale(frame, winStride=(8,8) )
 
     boxes = np.array([[x, y, x + w, y + h] for (x, y, w, h) in boxes])
+    
+    persons_detected = len(boxes)
 
     for (xA, yA, xB, yB) in boxes:
         # display the detected boxes in the colour picture
