@@ -3,7 +3,7 @@ import torch
 
 if __name__ == '__main__':
     model = YOLO("yolov8n.pt")
-    device = "cuda"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Using device: {device}")
     model.train(data="C:\\Users\\alexd\\Documents\\Datasets\\People Detection.v8i.yolov8\\data.yaml",
                 epochs=5, imgsz=640, device=device)
