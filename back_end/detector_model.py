@@ -4,9 +4,9 @@ from roboflow import Roboflow
 import os
 from dotenv import load_dotenv
 
-#rf = Roboflow(api_key=os.getenv("ROBOFLOW_API_KEY"))
-#project = rf.workspace("leo-ueno").project("people-detection-o4rdr")
-#dataset = project.version(8).download("yolov8")
+rf = Roboflow(api_key=os.getenv("ROBOFLOW_API_KEY"))
+project = rf.workspace("leo-ueno").project("people-detection-o4rdr")
+dataset = project.version(8).download("yolov8")
 
 if __name__ == '__main__':
     model = YOLO("yolov8n.pt")
