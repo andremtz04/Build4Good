@@ -1,0 +1,14 @@
+{
+  "name": "queue-time-app",
+  "version": "1.0.0",
+  "description": "An app to calculate and display estimated queue time",
+  "main": "front_end/main.js",
+  "scripts": {
+    "start": "electron front_end/main.js"
+  },
+  "devDependencies": {
+    "electron": "^35.1.2"
+  },
+  "author": "",
+  "license": "ISC"
+}

@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+
 import time
 import os
 from ultralytics import YOLO
@@ -30,6 +31,7 @@ def start_camera_capture():
 
     # open webcam video stream
     cap = cv2.VideoCapture(0)
+
 
     while(True):
         # Capture frame-by-frame
